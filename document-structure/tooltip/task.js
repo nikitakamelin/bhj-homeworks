@@ -16,18 +16,24 @@ const createActiveTooltip = item => {
 	divTooltip.style.left = item.getBoundingClientRect().left +"px";	
 	divTooltip.style.top = item.getBoundingClientRect().bottom + "px";
 	item.after(divTooltip);
-	//console.log(item.getBoundingClientRect().x);
+	
+	return links.indexOf(item);
 }
+// в переменную сохраняем значение индекса активной ссылки
+let activeIndex = -1;
 
 //функция обработчика клика по ссылке
-const checkoutLinks = item => {
+const checkoutLinks = (item,currentIndex) => {
+	
 	item.addEventListener('click', (e) => {
 		e.preventDefault();
 
 		deleteActiveTooltip();
-		createActiveTooltip(item);
+
+		//если индекс нажатой в данный момент ссылки (currentIndex) не равен 
+		//сохраненному в переменную activeIndex значению, то создаём подсказку
+		currentIndex != activeIndex ? activeIndex = createActiveTooltip(item) : activeIndex = -1;
 	})
 }
 //перебор массива со ссылками и выполнение функции-обработчика на каждом элементе
 links.forEach(checkoutLinks);
-

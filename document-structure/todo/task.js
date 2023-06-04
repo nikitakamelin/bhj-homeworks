@@ -5,8 +5,11 @@ const input = document.getElementById('task__input');
 //обработчик отправки формы (нажатия на кнопку)
 form.addEventListener('submit', e => {
 	e.preventDefault();
-	//запрещаем ввод пустой строки или пробела
-	if (input.value === '' || input.value === ' ') {
+
+	input.value = input.value.trim();
+
+	//запрещаем ввод пустой строки
+	if (!input.value) {
 		return;
 	}
 

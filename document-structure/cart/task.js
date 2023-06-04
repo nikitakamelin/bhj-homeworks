@@ -13,8 +13,8 @@ productQuantityControls.forEach( item => {
 		productQuantity.innerText++;
 	})
 	productQuantityDec.addEventListener('click', () => {
-		//ниже нуля количество невозможно
-		if (productQuantity.innerText <= 0) {
+		//меньше 1 количество добавить невозможно
+		if (productQuantity.innerText <= 1) {
 			return;
 		}
 		productQuantity.innerText--;
@@ -22,50 +22,39 @@ productQuantityControls.forEach( item => {
 });
 
 //достаем массив кнопок 'Добавить в корзину'
-const productAdds = document.querySelectorAll('.product__add');
-//const cartProducts = document.querySelector('.cart__products').children;
+const productAdds = [...document.querySelectorAll('.product__add')];
 
-//перебираем массив кнопок 'добавить в корзину'
-productAdds.forEach( item => {
-	//количество товара в корзине
-	let productQuantityCounter = 0;
-	
-	//обработчик клика по кнопке "Добавить в корзину"
+//перебираем массив кнопок Добавить в корзину
+productAdds.forEach(item => {
+
+	//достаем карточку товара который хотим положить в корзину, и контейнер с количеством
+	const product = item.closest('.product');
+	const quantityValueDiv = product.querySelector('.product__quantity-value');
+
+	//обработчик клика по кнопке Добавить в корзину
 	item.addEventListener('click', () => {
-		//достаем карточку товара
-		const product = item.closest('.product');
-		//Количество товара в корзине
-		const quantityValueDiv = product.querySelector('.product__quantity-value');
-		if (quantityValueDiv.innerText === 0) {
-			return;
-		}
-		//изображение товара из карточки
-		const img = product.querySelector('.product__image');
-		//ID товара
-		const dataId = product.dataset.id;
 
-		//обновляем счетчик количества
-		productQuantityCounter = productQuantityCounter + Number(quantityValueDiv.innerText);
-		
 		//достаем массив товаров попавших в корзину
-		const cartProducts = document.querySelector('.cart__products').children;
+		const cartProducts = [...document.querySelector('.cart__products').children];
 
-		//! При конструкции указанной ниже, карточки скачут, когда меняем количество товара в корзине 
-		//удаляем карточку из корзины если она уже создана (чтобы затем создать новую с правильным количеством)
-		Array.from(cartProducts).forEach(item => {
-			removeCartProduct(item, dataId);		
-		})
-		//создаем карточку в корзине
-		createCartProduct(dataId, img, productQuantityCounter);
-	})	
+		//если в корзину уже добавлен товар, который мы хотим добавить снова, находим этот элемент
+		let foundinCart = cartProducts.find(item => item.dataset.id === product.dataset.id);
+
+		//если элемент в корзине найден, меняем количество
+		if(foundinCart) {
+			console.log("меняем количество");
+			addAmountToCart(foundinCart, quantityValueDiv);
+		} else {
+			//иначе отрисовываем элемент в корзине
+			console.log("рисуем элемент");
+			const img = product.querySelector('.product__image');			
+			createCartProduct(product.dataset.id, img, quantityValueDiv.innerText);
+		}
+
+	})
+	
 })
-//функция удаления карточки из корзины
-function removeCartProduct(item, dataId) {
-	if (item.dataset.id === dataId) {
-		item.remove();
-		//item.replaceWith(item);
-	}
-}
+
 //функция создания карточки товара в корзине
 function createCartProduct(dataId, img, productQuantityCounter) {
 
@@ -85,30 +74,15 @@ function createCartProduct(dataId, img, productQuantityCounter) {
 	cartProducts.append(cartProduct);
 	cartProduct.append(cartImage);
 	cartProduct.append(count);
-	//return cartProduct;
 }
 
+//Функция добавляет количество товара в корзине
+function addAmountToCart(productInCart, productToAdd) {
 
-// isCreated = Array.from(cartProducts).find(item => item.dataset.id === dataId);
-//console.log(isCreated);
-		
-		// if (quantityValueDiv.innerText > 0) {
-		// 	if (!isCreated) {
-		// 		console.log("еще не создан");
-		// 		isCreated = drawCartProduct(dataId, img, productQuantityCounter);
-	
-		// 	} else {
-		// 		console.log("уже создан");
-		// 	}
-		// 	addAmountToCart(productQuantityCounter, isCreated);
-		// 	console.log(isCreated);
-		// }
+	let amountInCart = +productInCart.querySelector('.cart__product-count').innerText;
+	let amountToAdd = +productToAdd.innerText;
 
+	amountInCart = amountInCart + amountToAdd;
 
-// function addAmountToCart(productQuantityCounter, cartProduct) {
-// 	const count = document.createElement('div');
-// 	count.classList.add('cart__product-count');
-// 	count.innerText = productQuantityCounter;
-
-// 	// cartProduct.append(count);
-// }
+	productInCart.querySelector('.cart__product-count').innerText = amountInCart;
+}
