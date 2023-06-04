@@ -14,25 +14,33 @@ const setActiveElement = (element, index) => {
 
 //функция обработчик клика на кнопки переключения шрифта 
 const checkElement = (item, index) => {
-	item.addEventListener('click', (e) => {
+	item.addEventListener('click', event => {
 		//убираем стандартное поведение у ссылок 
-		e.preventDefault();
+		event.preventDefault();
 		//удаляем класс активного эл-та
 		clearActiveElement(fontSizeElements);
 		//устанавливаем класс новому активному эл-ту 
 		setActiveElement(fontSizeElements, index);
 
-		//удаляем классы влияющие на размер шрифта контента
-		item.closest('.book').classList.remove('book_fs-small');
-		item.closest('.book').classList.remove('book_fs-big');
+		// //удаляем классы влияющие на размер шрифта контента
+		// item.closest('.book').classList.remove('book_fs-small');
+		// item.closest('.book').classList.remove('book_fs-big');
 
-		//присваиваем новый размер шрифта контенту в зависимости от нажатой кнопки
-		if (item.classList.contains('font-size_small')) {
-			item.closest('.book').classList.add('book_fs-small');
-		};
-		if (item.classList.contains('font-size_big')) {
-			item.closest('.book').classList.add('book_fs-big');
-		};
+		// //присваиваем новый размер шрифта контенту в зависимости от нажатой кнопки
+		// if (item.classList.contains('font-size_small')) {
+		// 	item.closest('.book').classList.add('book_fs-small');
+		// };
+		// if (item.classList.contains('font-size_big')) {
+		// 	item.closest('.book').classList.add('book_fs-big');
+		// };
+		// * РЕШЕНИЕ ЭКСПЕРТА
+		const reader = document.querySelector('.book__content');
+		const size = event.target.dataset.size;
+		if (size) {
+		reader.className = `book__content book_fs-${size}`;
+		} else {
+		reader.className = "book__content";
+		}
 	})
 }
 //перебираем массив элементов и вызываем на каждом индексе функцию checkElement
