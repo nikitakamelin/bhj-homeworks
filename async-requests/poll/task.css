@@ -9,3 +9,8 @@ body {
 .poll__title {
   margin-bottom: 20px;
 }
+
+.poll__answer:focus {
+	color: #06f;
+	background-color: #fff;
+}
