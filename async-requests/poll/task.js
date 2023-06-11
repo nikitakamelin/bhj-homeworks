@@ -1,14 +1,21 @@
 //создаем экземпляр объекта XMLHttpRequest
 const xhr = new XMLHttpRequest();
 
+const url = 'https://students.netoservices.ru/nestjs-backend/poll';
+
 //открываем запрос
-xhr.open('GET', 'https://students.netoservices.ru/nestjs-backend/poll');
+xhr.open('GET', url);
 
 //устанавливаем требуемый тип ответа
 xhr.responseType = 'json';
 
 //функция которая сработает как только получим ответ от сервера
 xhr.onload = () => {
+	//простая обработка ошибок
+	if (xhr.status != 200) {
+		alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
+	}
+	
 	//функция отображает на странице вопрос (title) из опроса
 	setTitle(xhr.response.data.title);
 
@@ -27,17 +34,38 @@ xhr.onload = () => {
 	buttons.forEach((item, index) => {
 		item.addEventListener('click', () => {
 			
-			//alert('Спасибо, ваш голос засчитан!');
+			alert('Спасибо, ваш голос засчитан!');
 
-			//! Подскажите, пжлста
-			//! здесь пытался реализовать показ результатов голосования,
-			//! но респонс не виден в консоли, хотя в превью он виден
-			let xhr1 = new XMLHttpRequest;
-			xhr1.open( 'POST', 'https://students.netoservices.ru/nestjs-backend/poll' );
+			//отправляем другой запрос на сервер чтобы получить результаты опроса
+			let xhr1 = new XMLHttpRequest();
+			xhr1.open( 'POST', url);
 			xhr1.setRequestHeader( 'Content-type', 'application/x-www-form-urlencoded' );
-			xhr1.send(`vote=${voteId}&answer=${index}`);
 
-			console.log(xhr1.response); 	 
+			//обрабатываем ответ от сервера
+			xhr1.onload = () => {
+				//достаём массив объектов с результатами опроса из респонса сервера
+				const votesArray = JSON.parse(xhr1.response).stat;
+				let sum = 0;
+
+				//наверное, не совсем корректно, но таким образом убираем кнопки, чтобы заменить результатами опроса
+				document.getElementById('poll__answers').innerHTML = '';
+
+				// получаем сумму голосов для дальнейших расчетов
+				votesArray.forEach(item => {
+					sum = sum + item.votes;
+				})
+				//! 2 подряд цикла выглядит не очень, что-то не доходит откуда еще взять сумму голосов
+				//построчно отрисовывем результаты опроса
+				votesArray.forEach(item => {
+					
+					let html = `
+					${item.answer}: ${((item.votes/sum)*100).toFixed(2)} % <br>
+					`;
+
+					document.getElementById('poll__answers').innerHTML += html;
+				})
+			}
+			xhr1.send(`vote=${voteId}&answer=${index}`);
 		})	
 	})
 	
