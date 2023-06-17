@@ -12,6 +12,7 @@ const button = document.querySelector('button');
 
 //обработчик клика на кнопку Очистить
 button.addEventListener('click', e => {
-	localStorage.clear();
-	location.reload();
+	localStorage.removeItem('editor');
+	textarea.value = '';
+	//location.reload();
 })
